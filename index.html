@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOOK OF LEVI — COMMAND CENTER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET ────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── CSS VARS ─────────────────────────────────────────────── */
+    :root {
+      --bg:        #0a0a0a;
+      --surface:   #111111;
+      --surface2:  #181818;
+      --border:    #222222;
+      --blue:      #00d4ff;
+      --orange:    #ff6b00;
+      --green:     #39ff14;
+      --grey:      #555555;
+      --red:       #ff2244;
+      --text:      #e0e0e0;
+      --muted:     #666666;
+      --font-h:    'Bebas Neue', sans-serif;
+      --font-b:    'Inter', sans-serif;
+    }
+
+    /* ─── BASE ─────────────────────────────────────────────────── */
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-b);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ─── SCANLINES ────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.06) 2px,
+        rgba(0,0,0,0.06) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ─── CLASSIFIED WATERMARK ─────────────────────────────────── */
+    body::after {
+      content: 'CLASSIFIED';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-35deg);
+      font-family: var(--font-h);
+      font-size: 18vw;
+      color: rgba(255,255,255,0.018);
+      pointer-events: none;
+      z-index: 0;
+      white-space: nowrap;
+      letter-spacing: 0.2em;
+    }
+
+    /* ─── LAYOUT WRAPPER ───────────────────────────────────────── */
+    .app {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 0 0 2rem;
+    }
+
+    /* ─── HEADER ───────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 2rem;
+      background: linear-gradient(180deg, #0e0e0e 0%, rgba(10,10,10,0.8) 100%);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      gap: 1rem;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      opacity: 0.4;
+    }
+
+    .header-title {
+      font-family: var(--font-h);
+      font-size: 1.7rem;
+      letter-spacing: 0.12em;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .header-title span {
+      color: var(--blue);
+    }
+
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
+    .header-center .label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .header-center .total-tasks {
+      font-family: var(--font-h);
+      font-size: 2rem;
+      color: var(--green);
+      line-height: 1;
+      text-shadow: 0 0 14px rgba(57,255,20,0.4);
+    }
+
+    .header-clock {
+      text-align: right;
+      white-space: nowrap;
+    }
+    .header-clock .time {
+      font-family: var(--font-h);
+      font-size: 1.9rem;
+      letter-spacing: 0.08em;
+      color: var(--blue);
+      text-shadow: 0 0 10px rgba(0,212,255,0.35);
+    }
+    .header-clock .date {
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    /* ─── MAIN CONTENT ─────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      max-width: 1800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      min-width: 0;
+    }
+
+    /* ─── STATS ROW ────────────────────────────────────────────── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.1rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .stat-card.blue::after   { background: var(--blue);   box-shadow: 0 0 8px var(--blue); }
+    .stat-card.green::after  { background: var(--green);  box-shadow: 0 0 8px var(--green); }
+    .stat-card.orange::after { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+    .stat-card.grey::after   { background: var(--grey); }
+
+    .stat-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .stat-value {
+      font-family: var(--font-h);
+      font-size: 2.6rem;
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    .stat-card.blue   .stat-value { color: var(--blue);   text-shadow: 0 0 16px rgba(0,212,255,0.4); }
+    .stat-card.green  .stat-value { color: var(--green);  text-shadow: 0 0 16px rgba(57,255,20,0.4); }
+    .stat-card.orange .stat-value { color: var(--orange); text-shadow: 0 0 16px rgba(255,107,0,0.4); }
+    .stat-card.grey   .stat-value { color: var(--grey); }
+
+    .stat-sub {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    /* ─── AGENT GRID ───────────────────────────────────────────── */
+    .section-label {
+      font-family: var(--font-h);
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      border-left: 2px solid var(--blue);
+      padding-left: 0.6rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    /* ─── AGENT CARD ───────────────────────────────────────────── */
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      cursor: default;
+    }
+    .agent-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+    }
+    .agent-card.active {
+      border-color: rgba(0,212,255,0.35);
+      box-shadow: 0 0 18px rgba(0,212,255,0.1);
+    }
+    .agent-card.active:hover {
+      border-color: rgba(0,212,255,0.65);
+      box-shadow: 0 8px 32px rgba(0,212,255,0.2);
+    }
+    .agent-card.paused {
+      opacity: 0.65;
+    }
+
+    /* corner accent */
+    .agent-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 32px; height: 32px;
+      border-top: 1px solid var(--blue);
+      border-left: 1px solid var(--blue);
+      border-radius: 8px 0 0 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .agent-card.active::before { opacity: 0.5; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .card-emoji {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    /* Status dot */
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.active  { background: var(--green);  animation: pulse-green  1.6s ease-in-out infinite; }
+    .status-dot.working { background: var(--orange); animation: pulse-orange 1.6s ease-in-out infinite; }
+    .status-dot.idle    { background: var(--grey); }
+    .status-dot.paused  { background: var(--red); }
+
+    @keyframes pulse-green {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(57,255,20,0.7); }
+      50%       { box-shadow: 0 0 0 5px rgba(57,255,20,0); }
+    }
+    @keyframes pulse-orange {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,0,0.7); }
+      50%       { box-shadow: 0 0 0 5px rgba(255,107,0,0); }
+    }
+
+    .card-name {
+      font-family: var(--font-h);
+      font-size: 1.25rem;
+      letter-spacing: 0.1em;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 0.15rem;
+    }
+    .card-role {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .card-divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+      margin-bottom: 0.8rem;
+    }
+
+    .card-task {
+      font-size: 0.78rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      min-height: 2.1em;
+    }
+    .agent-card.active .card-task { color: #c8f0ff; }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.6rem;
+    }
+    .card-completed {
+      font-size: 0.68rem;
+      color: var(--green);
+      font-weight: 600;
+    }
+    .card-completed.zero { color: var(--muted); }
+
+    .status-badge {
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .status-badge.active  { background: rgba(57,255,20,0.12);  color: var(--green);  border: 1px solid rgba(57,255,20,0.25); }
+    .status-badge.idle    { background: rgba(85,85,85,0.15);   color: var(--grey);   border: 1px solid rgba(85,85,85,0.3); }
+    .status-badge.paused  { background: rgba(255,34,68,0.12);  color: var(--red);    border: 1px solid rgba(255,34,68,0.25); }
+    .status-badge.working { background: rgba(255,107,0,0.12);  color: var(--orange); border: 1px solid rgba(255,107,0,0.25); }
+
+    /* ─── SIDEBAR ──────────────────────────────────────────────── */
+    .sidebar {
+      width: 300px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .feed-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-height: calc(100vh - 160px);
+      position: sticky;
+      top: 80px;
+    }
+
+    .feed-header {
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .feed-title {
+      font-family: var(--font-h);
+      font-size: 0.9rem;
+      letter-spacing: 0.2em;
+      color: var(--blue);
+    }
+    .feed-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-green 1.6s ease-in-out infinite;
+    }
+
+    .feed-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .feed-list::-webkit-scrollbar { width: 4px; }
+    .feed-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .feed-item {
+      padding: 0.65rem 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      transition: background 0.15s;
+    }
+    .feed-item:hover { background: rgba(255,255,255,0.025); }
+    .feed-item:last-child { border-bottom: none; }
+
+    .feed-agent {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+    .feed-agent-emoji { font-size: 0.85rem; }
+    .feed-agent-name {
+      font-family: var(--font-h);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: #fff;
+    }
+    .feed-agent-time {
+      font-size: 0.6rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .feed-task {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .feed-check {
+      color: var(--green);
+      margin-right: 0.3rem;
+    }
+
+    /* ─── RESPONSIVE ───────────────────────────────────────────── */
+    @media (max-width: 1400px) {
+      .agent-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 1100px) {
+      .main { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        position: static;
+      }
+      .feed-panel {
+        max-height: 340px;
+        position: static;
+      }
+    }
+    @media (max-width: 900px) {
+      .agent-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .main { padding: 1rem; }
+      .header { padding: 0.9rem 1rem; }
+    }
+    @media (max-width: 520px) {
+      .agent-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .header-title { font-size: 1.1rem; }
+      .header-center .total-tasks { font-size: 1.4rem; }
+      .header-clock .time { font-size: 1.3rem; }
+    }
+
+    /* ─── GLOW LINE ────────────────────────────────────────────── */
+    .glow-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--blue) 50%, transparent 100%);
+      opacity: 0.25;
+      margin: 0.5rem 0;
+    }
+
+    /* ─── TICKER ───────────────────────────────────────────────── */
+    .ticker-bar {
+      background: rgba(0,212,255,0.04);
+      border-top: 1px solid rgba(0,212,255,0.12);
+      border-bottom: 1px solid rgba(0,212,255,0.12);
+      padding: 0.45rem 2rem;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-block;
+      animation: ticker 35s linear infinite;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: rgba(0,212,255,0.6);
+      text-transform: uppercase;
+    }
+    @keyframes ticker {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-title"><span>BOOK OF LEVI</span> — COMMAND CENTER</div>
+    <div class="header-center">
+      <div class="label">Tasks Completed Today</div>
+      <div class="total-tasks" id="totalTasks">0</div>
+    </div>
+    <div class="header-clock">
+      <div class="time" id="clock">00:00:00</div>
+      <div class="date" id="dateDisplay">--</div>
+    </div>
+  </header>
+
+  <!-- TICKER -->
+  <div class="ticker-bar">
+    <div class="ticker-inner">
+      ◈ SYSTEM ONLINE &nbsp;|&nbsp; ALL AGENTS MONITORED &nbsp;|&nbsp; SECURE CHANNEL ACTIVE &nbsp;|&nbsp;
+      AT0M PRIME v2.4 &nbsp;|&nbsp; BOOK OF LEVI OPS NETWORK &nbsp;|&nbsp; AUTHORIZED ACCESS ONLY &nbsp;|&nbsp;
+      RENDER: LORA TRAINING IN PROGRESS &nbsp;|&nbsp; FORGE: AT0M FIT DEVELOPMENT ACTIVE &nbsp;|&nbsp;
+      OPERATOR: DISPATCHING TASKS &nbsp;|&nbsp; ◈ SYSTEM ONLINE
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="content">
+
+      <!-- STATS -->
+      <div class="stats" id="statsRow"></div>
+
+      <!-- AGENT GRID -->
+      <div>
+        <div class="section-label">AGENT STATIONS</div>
+        <div class="glow-line"></div>
+        <div class="agent-grid" id="agentGrid"></div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR FEED -->
+    <aside class="sidebar">
+      <div class="feed-panel">
+        <div class="feed-header">
+          <div class="feed-title">ACTIVITY FEED</div>
+          <div class="feed-dot"></div>
+        </div>
+        <div class="feed-list" id="activityFeed"></div>
+      </div>
+    </aside>
+  </div>
+
+</div>
+
+<script>
+  // ─── AGENT DATA ──────────────────────────────────────────────
+  const AGENTS = {
+    at0m:     { name:"At0m",     role:"Executive / Strategic",      emoji:"⚛️",  status:"active",  current_task:"Managing operations",          completed_today:24 },
+    operator: { name:"Operator", role:"Team Manager",               emoji:"🎯",  status:"active",  current_task:"Dispatching LoRA training",     completed_today:2  },
+    miriam:   { name:"Miriam",   role:"Biblical Universe Creative",  emoji:"📜",  status:"idle",    current_task:"Next run: 2PM ET",             completed_today:1  },
+    solomon:  { name:"Solomon",  role:"Fitness Research",            emoji:"💪",  status:"idle",    current_task:"Awaiting schedule",            completed_today:1  },
+    daniel:   { name:"Daniel",   role:"Calendar & Intel",            emoji:"📅",  status:"idle",    current_task:"Scheduled 7AM ET",             completed_today:1  },
+    deborah:  { name:"Deborah",  role:"EOD Digest",                  emoji:"⚖️",  status:"paused",  current_task:"Paused — reactivating soon",   completed_today:0  },
+    ezra:     { name:"Ezra",     role:"Drive Sync",                  emoji:"📁",  status:"idle",    current_task:"Last sync: 30min ago",         completed_today:18 },
+    pulse:    { name:"Pulse",    role:"Email Dispatch",              emoji:"📧",  status:"idle",    current_task:"Monitoring inbox",             completed_today:3  },
+    forge:    { name:"Forge",    role:"Dev & Engineering",           emoji:"⚙️",  status:"active",  current_task:"Building At0m Fit",            completed_today:1  },
+    render:   { name:"Render",   role:"Image Generation",            emoji:"🎨",  status:"active",  current_task:"Training 5 character LoRAs",   completed_today:3  },
+    scribe:   { name:"Scribe",   role:"Content & Writing",           emoji:"✍️",  status:"idle",    current_task:"Books 1-5 complete",           completed_today:5  }
+  };
+
+  // ─── ACTIVITY FEED DATA ──────────────────────────────────────
+  const ACTIVITY = [
+    { agent:"at0m",    task:"Strategic ops review complete",        mins:2  },
+    { agent:"render",  task:"LoRA checkpoint saved — Char #3",      mins:8  },
+    { agent:"ezra",    task:"Drive sync — 47 files updated",        mins:12 },
+    { agent:"at0m",    task:"Cross-agent briefing dispatched",       mins:18 },
+    { agent:"scribe",  task:"Book 5 manuscript finalized",          mins:25 },
+    { agent:"operator",task:"Training job dispatched to Render",    mins:31 },
+    { agent:"pulse",   task:"3 emails dispatched — outreach batch", mins:44 },
+    { agent:"ezra",    task:"Drive sync — 31 files updated",        mins:60 },
+    { agent:"forge",   task:"At0m Fit API endpoint wired",          mins:72 },
+    { agent:"at0m",    task:"Agent health check completed",         mins:85 },
+    { agent:"scribe",  task:"Book 4 second draft done",             mins:98 },
+    { agent:"miriam",  task:"Chapter 12 narrative generated",       mins:110 },
+    { agent:"ezra",    task:"Drive sync — 22 files updated",        mins:120 },
+    { agent:"daniel",  task:"Weekly intel brief compiled",          mins:145 },
+    { agent:"solomon", task:"Training protocol research done",      mins:160 },
+    { agent:"pulse",   task:"Inbox scan — no priority items",       mins:200 },
+    { agent:"render",  task:"LoRA checkpoint saved — Char #2",      mins:230 },
+    { agent:"at0m",    task:"Morning briefing logged",              mins:280 },
+  ];
+
+  // ─── STATS ───────────────────────────────────────────────────
+  function computeStats() {
+    const agents = Object.values(AGENTS);
+    return {
+      active:    agents.filter(a => a.status === 'active').length,
+      completed: agents.reduce((s,a) => s + a.completed_today, 0),
+      inprogress:agents.filter(a => a.status === 'active' || a.status === 'working').length,
+      paused:    agents.filter(a => a.status === 'paused').length
+    };
+  }
+
+  function renderStats() {
+    const s = computeStats();
+    const el = document.getElementById('statsRow');
+    el.innerHTML = `
+      <div class="stat-card blue">
+        <div class="stat-label">Agents Active</div>
+        <div class="stat-value">${s.active}</div>
+        <div class="stat-sub">of ${Object.keys(AGENTS).length} total</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Tasks Completed Today</div>
+        <div class="stat-value">${s.completed}</div>
+        <div class="stat-sub">across all agents</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">In Progress</div>
+        <div class="stat-value">${s.inprogress}</div>
+        <div class="stat-sub">agents running</div>
+      </div>
+      <div class="stat-card grey">
+        <div class="stat-label">Paused</div>
+        <div class="stat-value">${s.paused}</div>
+        <div class="stat-sub">awaiting reactivation</div>
+      </div>
+    `;
+    document.getElementById('totalTasks').textContent = s.completed;
+  }
+
+  // ─── AGENT GRID ──────────────────────────────────────────────
+  function dotClass(status) {
+    if (status === 'active')  return 'active';
+    if (status === 'working') return 'working';
+    if (status === 'paused')  return 'paused';
+    return 'idle';
+  }
+
+  function badgeLabel(status) {
+    if (status === 'active')  return 'ONLINE';
+    if (status === 'working') return 'WORKING';
+    if (status === 'paused')  return 'PAUSED';
+    return 'IDLE';
+  }
+
+  function renderAgents() {
+    const grid = document.getElementById('agentGrid');
+    grid.innerHTML = Object.entries(AGENTS).map(([key, a]) => {
+      const cardClass = ['agent-card', a.status === 'active' ? 'active' : '', a.status === 'paused' ? 'paused' : ''].filter(Boolean).join(' ');
+      const completedClass = a.completed_today === 0 ? 'card-completed zero' : 'card-completed';
+      return `
+        <div class="${cardClass}">
+          <div class="card-header">
+            <span class="card-emoji">${a.emoji}</span>
+            <span class="status-dot ${dotClass(a.status)}"></span>
+          </div>
+          <div class="card-name">${a.name.toUpperCase()}</div>
+          <div class="card-role">${a.role}</div>
+          <div class="card-divider"></div>
+          <div class="card-task">${a.current_task}</div>
+          <div class="card-meta">
+            <span class="status-badge ${a.status}">${badgeLabel(a.status)}</span>
+            <span class="${completedClass}">✓ ${a.completed_today} today</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ─── ACTIVITY FEED ───────────────────────────────────────────
+  function renderFeed() {
+    const feed = document.getElementById('activityFeed');
+    feed.innerHTML = ACTIVITY.map(item => {
+      const agent = AGENTS[item.agent];
+      if (!agent) return '';
+      const timeLabel = item.mins < 60
+        ? `${item.mins}m ago`
+        : `${Math.floor(item.mins/60)}h ${item.mins%60}m ago`;
+      return `
+        <div class="feed-item">
+          <div class="feed-agent">
+            <span class="feed-agent-emoji">${agent.emoji}</span>
+            <span class="feed-agent-name">${agent.name.toUpperCase()}</span>
+            <span class="feed-agent-time">${timeLabel}</span>
+          </div>
+          <div class="feed-task"><span class="feed-check">✓</span>${item.task}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ─── CLOCK ───────────────────────────────────────────────────
+  function updateClock() {
+    const now = new Date();
+    const hh = String(now.getUTCHours()).padStart(2,'0');
+    const mm = String(now.getUTCMinutes()).padStart(2,'0');
+    const ss = String(now.getUTCSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+
+    const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const d = days[now.getUTCDay()];
+    const mo = months[now.getUTCMonth()];
+    const dt = String(now.getUTCDate()).padStart(2,'0');
+    const yr = now.getUTCFullYear();
+    document.getElementById('dateDisplay').textContent = `${d} ${dt} ${mo} ${yr} · UTC`;
+  }
+
+  // ─── INIT ─────────────────────────────────────────────────────
+  renderStats();
+  renderAgents();
+  renderFeed();
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
