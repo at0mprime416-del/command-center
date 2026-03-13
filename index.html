@@ -1,883 +1,1066 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>BOOK OF LEVI — COMMAND CENTER</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    /* ─── RESET ──────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOOK OF LEVI // COMMAND CENTER</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050505;
+    --gold: #C9A84C;
+    --gold-bright: #F0C040;
+    --dark-grey: #1A1A1A;
+    --mid-grey: #2A2A2A;
+    --text: #E8E0CC;
+  }
 
-    /* ─── CSS VARS ───────────────────────────────────────────── */
-    :root {
-      --bg:        #0a0a0a;
-      --surface:   #111111;
-      --surface2:  #181818;
-      --border:    #222222;
-      --blue:      #00d4ff;
-      --gold:      #c9a84c;
-      --orange:    #ff6b00;
-      --green:     #39ff14;
-      --grey:      #555555;
-      --red:       #ff2244;
-      --text:      #e0e0e0;
-      --muted:     #666666;
-      --font-h:    'Bebas Neue', sans-serif;
-      --font-b:    'Inter', sans-serif;
-      --nav-h:     56px;
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* ─── BASE ───────────────────────────────────────────────── */
-    html {
-      font-size: 16px;
-      overflow-x: hidden;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-b);
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
-      width: 100%;
-      max-width: 100vw;
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
 
-    /* ─── SCANLINES ──────────────────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.06) 2px,
-        rgba(0,0,0,0.06) 4px
-      );
-      pointer-events: none;
-      z-index: 1000;
-    }
+  /* ===================== PASSWORD GATE ===================== */
+  #password-gate {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    gap: 20px;
+  }
 
-    /* ─── CLASSIFIED WATERMARK ───────────────────────────────── */
-    body::after {
-      content: 'CLASSIFIED';
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-35deg);
-      font-family: var(--font-h);
-      font-size: 18vw;
-      color: rgba(255,255,255,0.018);
-      pointer-events: none;
-      z-index: 0;
-      white-space: nowrap;
-      letter-spacing: 0.2em;
-    }
+  #password-gate .gate-title {
+    font-family: 'Black Ops One', cursive;
+    color: var(--gold);
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    letter-spacing: 0.3em;
+    text-align: center;
+  }
 
-    /* ─── APP WRAPPER ────────────────────────────────────────── */
-    .app {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      /* bottom padding on mobile for fixed nav */
-      padding-bottom: calc(var(--nav-h) + 0.5rem);
-    }
+  #password-gate .gate-subtitle {
+    color: var(--text);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    opacity: 0.5;
+    margin-bottom: 10px;
+  }
 
-    /* ─── HEADER ─────────────────────────────────────────────── */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-      background: linear-gradient(180deg, #0e0e0e 0%, rgba(10,10,10,0.9) 100%);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      backdrop-filter: blur(12px);
-      gap: 0.75rem;
-      width: 100%;
-    }
-    .header::before {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--blue), transparent);
-      opacity: 0.4;
-    }
+  #password-gate .lock-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 12px var(--gold));
+  }
 
-    /* Mobile header: show compact title + clock only */
-    .header-title {
-      font-family: var(--font-h);
-      font-size: 1.3rem;
-      letter-spacing: 0.1em;
-      color: #fff;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .header-title span { color: var(--blue); }
-    .header-title .full-title { display: none; }
-    .header-title .short-title { display: inline; }
+  #access-input {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-bright);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    letter-spacing: 0.3em;
+    padding: 14px 24px;
+    width: min(340px, 80vw);
+    text-align: center;
+    outline: none;
+    box-shadow: 0 0 16px rgba(201, 168, 76, 0.2), inset 0 0 8px rgba(201, 168, 76, 0.05);
+    transition: box-shadow 0.3s;
+  }
 
-    /* Center stats — hidden on mobile to save space */
-    .header-center {
-      text-align: center;
-      flex: 1;
-      display: none;
-    }
-    .header-center .label {
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .header-center .total-tasks {
-      font-family: var(--font-h);
-      font-size: 1.8rem;
-      color: var(--green);
-      line-height: 1;
-      text-shadow: 0 0 14px rgba(57,255,20,0.4);
-    }
+  #access-input:focus {
+    box-shadow: 0 0 24px rgba(201, 168, 76, 0.5), inset 0 0 12px rgba(201, 168, 76, 0.1);
+  }
 
-    .header-clock {
-      text-align: right;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .header-clock .time {
-      font-family: var(--font-h);
-      font-size: 1.5rem;
-      letter-spacing: 0.08em;
-      color: var(--blue);
-      text-shadow: 0 0 10px rgba(0,212,255,0.35);
-    }
-    .header-clock .date {
-      font-size: 0.55rem;
-      color: var(--muted);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
+  #access-input::placeholder { color: rgba(201,168,76,0.4); letter-spacing: 0.2em; }
 
-    /* ─── TICKER ─────────────────────────────────────────────── */
-    .ticker-bar {
-      background: rgba(0,212,255,0.04);
-      border-top: 1px solid rgba(0,212,255,0.12);
-      border-bottom: 1px solid rgba(0,212,255,0.12);
-      padding: 0.4rem 0;
-      overflow: hidden;
-      white-space: nowrap;
-      width: 100%;
-    }
-    .ticker-inner {
-      display: inline-block;
-      animation: ticker 35s linear infinite;
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      color: rgba(0,212,255,0.6);
-      text-transform: uppercase;
-    }
-    @keyframes ticker {
-      0%   { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
-    }
+  #access-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Black Ops One', cursive;
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    padding: 10px 32px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  }
 
-    /* ─── MAIN ───────────────────────────────────────────────── */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
-      width: 100%;
-    }
+  #access-btn:hover {
+    background: var(--gold);
+    color: #000;
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.6);
+  }
 
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      min-width: 0;
-      width: 100%;
-    }
+  #access-error {
+    color: #FF4444;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    height: 20px;
+    transition: opacity 0.3s;
+    opacity: 0;
+  }
 
-    /* ─── STATS ROW ──────────────────────────────────────────── */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.9rem 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-    }
-    .stat-card.blue::after   { background: var(--blue);   box-shadow: 0 0 8px var(--blue); }
-    .stat-card.green::after  { background: var(--green);  box-shadow: 0 0 8px var(--green); }
-    .stat-card.orange::after { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
-    .stat-card.grey::after   { background: var(--grey); }
+  #access-error.show { opacity: 1; }
 
-    .stat-label {
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 0.3rem;
-    }
-    .stat-value {
-      font-family: var(--font-h);
-      font-size: 2.2rem;
-      line-height: 1;
-      margin-bottom: 0.15rem;
-    }
-    .stat-card.blue   .stat-value { color: var(--blue);   text-shadow: 0 0 16px rgba(0,212,255,0.4); }
-    .stat-card.green  .stat-value { color: var(--green);  text-shadow: 0 0 16px rgba(57,255,20,0.4); }
-    .stat-card.orange .stat-value { color: var(--orange); text-shadow: 0 0 16px rgba(255,107,0,0.4); }
-    .stat-card.grey   .stat-value { color: var(--grey); }
-    .stat-sub { font-size: 0.62rem; color: var(--muted); }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+  }
 
-    /* ─── SECTION LABEL ──────────────────────────────────────── */
-    .section-label {
-      font-family: var(--font-h);
-      font-size: 0.8rem;
-      letter-spacing: 0.3em;
-      color: var(--muted);
-      text-transform: uppercase;
-      border-left: 2px solid var(--blue);
-      padding-left: 0.6rem;
-      margin-bottom: 0.2rem;
-    }
-    .glow-line {
-      height: 1px;
-      background: linear-gradient(90deg, transparent 0%, var(--blue) 50%, transparent 100%);
-      opacity: 0.25;
-      margin: 0.4rem 0;
-    }
+  .shake { animation: shake 0.4s ease; }
 
-    /* ─── AGENT GRID ─────────────────────────────────────────── */
-    /* Mobile default: 1 column */
-    .agent-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
+  #password-gate.fade-out {
+    animation: fadeOut 0.8s ease forwards;
+  }
 
-    /* ─── AGENT CARD ─────────────────────────────────────────── */
-    .agent-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      cursor: default;
-      min-height: 160px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .agent-card:active {
-      transform: scale(0.98);
-    }
-    .agent-card.active {
-      border-color: rgba(0,212,255,0.35);
-      box-shadow: 0 0 18px rgba(0,212,255,0.1);
-    }
-    .agent-card.paused { opacity: 0.65; }
+  @keyframes fadeOut {
+    to { opacity: 0; pointer-events: none; }
+  }
 
-    .agent-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 28px; height: 28px;
-      border-top: 1px solid var(--blue);
-      border-left: 1px solid var(--blue);
-      border-radius: 8px 0 0 0;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .agent-card.active::before { opacity: 0.5; }
+  /* ===================== MAIN APP ===================== */
+  #app {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+  }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.4rem;
-    }
-    .card-emoji {
-      font-size: 2rem;
-      line-height: 1;
-    }
+  #app.visible { display: flex; }
 
-    .status-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .status-dot.active  { background: var(--green);  animation: pulse-green  1.6s ease-in-out infinite; }
-    .status-dot.working { background: var(--orange); animation: pulse-orange 1.6s ease-in-out infinite; }
-    .status-dot.idle    { background: var(--grey); }
-    .status-dot.paused  { background: var(--red); }
+  /* ===================== TOP BAR ===================== */
+  #top-bar {
+    height: 44px;
+    background: rgba(10,10,10,0.95);
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 100;
+  }
 
-    @keyframes pulse-green {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(57,255,20,0.7); }
-      50%       { box-shadow: 0 0 0 5px rgba(57,255,20,0); }
-    }
-    @keyframes pulse-orange {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,0,0.7); }
-      50%       { box-shadow: 0 0 0 5px rgba(255,107,0,0); }
-    }
+  #top-bar .site-title {
+    font-family: 'Black Ops One', cursive;
+    color: var(--gold);
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 10px rgba(201,168,76,0.5);
+  }
 
-    .card-name {
-      font-family: var(--font-h);
-      font-size: 1.2rem;
-      letter-spacing: 0.1em;
-      color: #fff;
-      line-height: 1.1;
-      margin-bottom: 0.1rem;
-    }
-    .card-role {
-      font-size: 0.62rem;
-      letter-spacing: 0.14em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 0.6rem;
-    }
-    .card-divider {
-      height: 1px;
-      background: linear-gradient(90deg, var(--border), transparent);
-      margin-bottom: 0.6rem;
-    }
-    .card-task {
-      font-size: 0.8rem;
-      color: var(--text);
-      line-height: 1.4;
-      flex: 1;
-    }
-    .agent-card.active .card-task { color: #c8f0ff; }
+  #desktop-nav {
+    display: none;
+    gap: 6px;
+  }
 
-    .card-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-top: 0.6rem;
-    }
-    .card-completed { font-size: 0.68rem; color: var(--green); font-weight: 600; }
-    .card-completed.zero { color: var(--muted); }
+  @media (min-width: 768px) {
+    #desktop-nav { display: flex; }
+  }
 
-    .status-badge {
-      font-size: 0.58rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      padding: 0.15rem 0.45rem;
-      border-radius: 3px;
-      font-weight: 600;
-    }
-    .status-badge.active  { background: rgba(57,255,20,0.12);  color: var(--green);  border: 1px solid rgba(57,255,20,0.25); }
-    .status-badge.idle    { background: rgba(85,85,85,0.15);   color: var(--grey);   border: 1px solid rgba(85,85,85,0.3); }
-    .status-badge.paused  { background: rgba(255,34,68,0.12);  color: var(--red);    border: 1px solid rgba(255,34,68,0.25); }
-    .status-badge.working { background: rgba(255,107,0,0.12);  color: var(--orange); border: 1px solid rgba(255,107,0,0.25); }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    padding: 6px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.6;
+  }
 
-    /* ─── SIDEBAR / FEED ─────────────────────────────────────── */
-    .sidebar {
-      width: 100%;
-      display: none; /* hidden on mobile by default */
-    }
-    .sidebar.feed-visible { display: block; }
+  .nav-btn.active, .nav-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(201,168,76,0.2);
+  }
 
-    .feed-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+  /* ===================== PAGES ===================== */
+  #pages {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
 
-    .feed-header {
-      padding: 0.9rem 1.2rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface2);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .feed-title {
-      font-family: var(--font-h);
-      font-size: 0.9rem;
-      letter-spacing: 0.2em;
-      color: var(--blue);
-    }
-    .feed-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse-green 1.6s ease-in-out infinite;
-    }
+  .page {
+    position: absolute;
+    inset: 0;
+    display: none;
+  }
 
-    .feed-list {
-      overflow-y: auto;
-      max-height: 420px;
-      padding: 0.4rem 0;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
-    }
-    .feed-list::-webkit-scrollbar { width: 4px; }
-    .feed-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .page.active { display: block; }
 
-    .feed-item {
-      padding: 0.6rem 1.2rem;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-    }
-    .feed-item:last-child { border-bottom: none; }
-    .feed-agent {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.2rem;
-    }
-    .feed-agent-emoji { font-size: 0.9rem; }
-    .feed-agent-name {
-      font-family: var(--font-h);
-      font-size: 0.8rem;
-      letter-spacing: 0.1em;
-      color: #fff;
-    }
-    .feed-agent-time {
-      font-size: 0.6rem;
-      color: var(--muted);
-      margin-left: auto;
-    }
-    .feed-task { font-size: 0.7rem; color: var(--muted); line-height: 1.4; }
-    .feed-check { color: var(--green); margin-right: 0.3rem; }
+  /* ===================== MAP PAGE ===================== */
+  #map-page {
+    background: var(--bg);
+    overflow: hidden;
+  }
 
-    /* ─── BOTTOM NAV (mobile only) ───────────────────────────── */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: var(--nav-h);
-      background: #0e0e0e;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: stretch;
-      z-index: 300;
-    }
-    .bottom-nav::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--blue), transparent);
-      opacity: 0.3;
-    }
-    .nav-tab {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.2rem;
-      font-size: 0.55rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--grey);
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      padding: 0;
-      transition: color 0.2s, background 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .nav-tab .nav-icon { font-size: 1.2rem; line-height: 1; }
-    .nav-tab.active { color: var(--gold); }
-    .nav-tab.active .nav-label { color: var(--gold); }
-    .nav-tab:active { background: rgba(255,255,255,0.04); }
+  #map-canvas-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
 
-    /* ─── SECTION VISIBILITY ─────────────────────────────────── */
-    /* Mobile: sections shown/hidden by tab */
-    .section-panel { display: none; }
-    .section-panel.active { display: block; }
+  /* Scanlines */
+  #map-canvas-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+  }
 
-    /* ─── TABLET ─────────────────────────────────────────────── */
-    @media (min-width: 520px) {
-      .agent-grid { grid-template-columns: repeat(2, 1fr); }
-    }
+  /* Corner HUD brackets */
+  .hud-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: var(--gold);
+    border-style: solid;
+    opacity: 0.5;
+    z-index: 5;
+  }
 
-    /* ─── DESKTOP ────────────────────────────────────────────── */
-    @media (min-width: 900px) {
-      /* Reset bottom nav padding */
-      .app { padding-bottom: 2rem; }
+  .hud-corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+  .hud-corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+  .hud-corner.bl { bottom: 48px; left: 8px; border-width: 0 0 2px 2px; }
+  .hud-corner.br { bottom: 48px; right: 8px; border-width: 0 2px 2px 0; }
 
-      /* Hide bottom nav on desktop */
-      .bottom-nav { display: none; }
+  /* SVG connection lines layer */
+  #connection-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+  }
 
-      /* Show all sections always on desktop */
-      .section-panel { display: block !important; }
+  /* ===================== AGENT SPRITES ===================== */
+  .agent-sprite {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: filter 0.2s;
+    user-select: none;
+  }
 
-      /* Header desktop */
-      .header { padding: 1.1rem 2rem; }
-      .header-title .full-title { display: inline; }
-      .header-title .short-title { display: none; }
-      .header-title { font-size: 1.7rem; }
-      .header-center { display: block; }
-      .header-clock .time { font-size: 1.9rem; }
-      .header-clock .date { font-size: 0.62rem; }
+  .agent-sprite:hover { filter: brightness(1.4); }
 
-      /* Main layout: side by side */
-      .main {
-        flex-direction: row;
-        padding: 1.5rem 2rem;
-        max-width: 1800px;
-        margin: 0 auto;
-        align-items: flex-start;
-      }
+  .sprite-body-wrap {
+    position: relative;
+    width: 36px;
+    height: 48px;
+  }
 
-      /* Stats: 4 columns */
-      .stats { grid-template-columns: repeat(4, 1fr); }
+  /* Among Us head */
+  .sprite-head {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 22px;
+    border-radius: 14px 14px 4px 4px;
+  }
 
-      /* Agent grid: 3 columns */
-      .agent-grid { grid-template-columns: repeat(3, 1fr); }
+  /* visor */
+  .sprite-visor {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 10px;
+    background: rgba(150,220,255,0.8);
+    border-radius: 6px 6px 2px 2px;
+    box-shadow: 0 0 6px rgba(150,220,255,0.6);
+  }
 
-      /* Agent cards: reset mobile overrides */
-      .agent-card { min-height: auto; }
-      .card-emoji { font-size: 1.5rem; }
-      .status-dot { width: 10px; height: 10px; }
+  /* body */
+  .sprite-torso {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 22px;
+    border-radius: 6px 6px 0 0;
+  }
 
-      /* Sidebar always visible on desktop */
-      .sidebar {
-        display: block;
-        width: 300px;
-        flex-shrink: 0;
-      }
-      .feed-panel {
-        max-height: calc(100vh - 160px);
-        position: sticky;
-        top: 80px;
-      }
-      .feed-list { max-height: none; flex: 1; }
-    }
+  /* backpack bump */
+  .sprite-pack {
+    position: absolute;
+    bottom: 6px;
+    right: 1px;
+    width: 10px;
+    height: 14px;
+    border-radius: 3px;
+    opacity: 0.7;
+  }
 
-    /* ─── WIDE ───────────────────────────────────────────────── */
-    @media (min-width: 1200px) {
-      .agent-grid { grid-template-columns: repeat(4, 1fr); }
-    }
-  </style>
+  /* legs */
+  .sprite-leg-l, .sprite-leg-r {
+    position: absolute;
+    bottom: -8px;
+    width: 12px;
+    height: 10px;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .sprite-leg-l { left: 2px; }
+  .sprite-leg-r { right: 2px; }
+
+  @keyframes walk {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+
+  .agent-sprite .sprite-body-wrap {
+    animation: walk 0.5s infinite;
+  }
+
+  .agent-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text);
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+    text-shadow: 0 0 4px #000, 0 0 8px #000;
+    white-space: nowrap;
+  }
+
+  .status-dot-sprite {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 2px;
+  }
+
+  .status-dot-sprite.active { background: #44FF88; box-shadow: 0 0 6px #44FF88; }
+  .status-dot-sprite.idle   { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+  .status-dot-sprite.paused { background: #FF6644; box-shadow: 0 0 6px #FF6644; }
+
+  /* ===================== MAP BOTTOM BAR ===================== */
+  #map-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 36px;
+    background: rgba(10,10,10,0.9);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 20;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+  }
+
+  #live-clock { color: var(--gold); }
+  #active-count { color: var(--text); opacity: 0.7; }
+
+  /* ===================== HUD PANEL ===================== */
+  #hud-panel {
+    position: absolute;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: calc(100% - 36px);
+    background: rgba(10,10,10,0.95);
+    border-left: 1px solid var(--gold);
+    z-index: 50;
+    transition: right 0.3s ease;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  #hud-panel.open { right: 0; }
+
+  #hud-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: var(--gold);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  #hud-name {
+    font-family: 'Black Ops One', cursive;
+    color: var(--gold);
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding-bottom: 10px;
+    margin-top: 10px;
+  }
+
+  .hud-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .hud-label {
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  .hud-value {
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+
+  .hud-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #hud-dossier {
+    margin-top: auto;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Black Ops One', cursive;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  #hud-dossier:hover {
+    background: var(--gold);
+    color: #000;
+  }
+
+  /* ===================== AGENT ROSTER PAGE ===================== */
+  #roster-page {
+    overflow-y: auto;
+    padding: 20px;
+    background: var(--bg);
+  }
+
+  .roster-header {
+    font-family: 'Black Ops One', cursive;
+    color: var(--gold);
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    letter-spacing: 0.2em;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    text-align: center;
+  }
+
+  .roster-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 640px) {
+    .roster-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .roster-grid { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  /* Dossier card */
+  .agent-card {
+    background: var(--dark-grey);
+    border: 1px solid var(--gold);
+    position: relative;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Corner brackets */
+  .agent-card::before,
+  .agent-card::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--gold-bright);
+    border-style: solid;
+    opacity: 0.8;
+  }
+
+  .agent-card::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .agent-card::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-dot.active { background: #44FF88; box-shadow: 0 0 6px #44FF88; }
+  .status-dot.idle   { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+  .status-dot.paused { background: #FF6644; box-shadow: 0 0 6px #FF6644; }
+
+  .card-name {
+    font-family: 'Black Ops One', cursive;
+    color: var(--gold);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    flex: 1;
+  }
+
+  .class-badge {
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    padding: 2px 6px;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: rgba(201,168,76,0.7);
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .card-role {
+    font-size: 0.7rem;
+    color: var(--text);
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .card-task {
+    font-size: 0.75rem;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .task-label {
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    opacity: 0.7;
+  }
+
+  .card-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text);
+    opacity: 0.5;
+    padding-top: 6px;
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .task-log-toggle {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    padding: 6px 10px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: border-color 0.2s;
+  }
+
+  .task-log-toggle:hover { border-color: var(--gold); }
+
+  .task-log {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(201,168,76,0.15);
+    font-size: 0.7rem;
+  }
+
+  .task-log.open { display: flex; }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: var(--text);
+    opacity: 0.8;
+    line-height: 1.4;
+  }
+
+  .task-item .tick { color: var(--gold-bright); flex-shrink: 0; }
+  .task-item .pend { color: #888; flex-shrink: 0; }
+
+  /* ===================== BOTTOM NAV (mobile) ===================== */
+  #bottom-nav {
+    height: 44px;
+    background: rgba(10,10,10,0.95);
+    border-top: 1px solid rgba(201,168,76,0.3);
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 768px) {
+    #bottom-nav { display: none; }
+  }
+
+  .bottom-nav-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    opacity: 0.5;
+    transition: all 0.2s;
+  }
+
+  .bottom-nav-btn.active {
+    color: var(--gold);
+    opacity: 1;
+    border-top: 2px solid var(--gold);
+  }
+
+  .bottom-nav-btn .nav-icon { font-size: 1rem; }
+
+  /* ===================== SCANLINE on whole app ===================== */
+  #app::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+</style>
 </head>
 <body>
-<div class="app">
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-title">
-      <span class="short-title"><span>CMD</span> CENTER</span>
-      <span class="full-title"><span>BOOK OF LEVI</span> — COMMAND CENTER</span>
-    </div>
-    <div class="header-center">
-      <div class="label">Tasks Completed Today</div>
-      <div class="total-tasks" id="totalTasks">0</div>
-    </div>
-    <div class="header-clock">
-      <div class="time" id="clock">00:00:00</div>
-      <div class="date" id="dateDisplay">--</div>
-    </div>
-  </header>
+<!-- =================== PASSWORD GATE =================== -->
+<div id="password-gate">
+  <div class="lock-icon">🔒</div>
+  <div class="gate-title">BOOK OF LEVI</div>
+  <div class="gate-subtitle">CLASSIFIED // COMMAND ACCESS ONLY</div>
+  <input type="password" id="access-input" placeholder="ENTER ACCESS CODE" autocomplete="off">
+  <div id="access-error">⚠ ACCESS DENIED</div>
+  <button id="access-btn">AUTHENTICATE</button>
+</div>
 
-  <!-- TICKER -->
-  <div class="ticker-bar">
-    <div class="ticker-inner">
-      ◈ SYSTEM ONLINE &nbsp;|&nbsp; ALL AGENTS MONITORED &nbsp;|&nbsp; SECURE CHANNEL ACTIVE &nbsp;|&nbsp;
-      AT0M PRIME v2.4 &nbsp;|&nbsp; BOOK OF LEVI OPS NETWORK &nbsp;|&nbsp; AUTHORIZED ACCESS ONLY &nbsp;|&nbsp;
-      RENDER: LORA TRAINING IN PROGRESS &nbsp;|&nbsp; FORGE: COMMAND CENTER REBUILD ACTIVE &nbsp;|&nbsp;
-      OPERATOR: DISPATCHING TASKS &nbsp;|&nbsp; ◈ SYSTEM ONLINE
-    </div>
+<!-- =================== MAIN APP =================== -->
+<div id="app">
+
+  <!-- Top Bar -->
+  <div id="top-bar">
+    <div class="site-title">BOOK OF LEVI // OPERATIONS MAP</div>
+    <nav id="desktop-nav">
+      <button class="nav-btn active" onclick="showPage('map')">⬡ MAP</button>
+      <button class="nav-btn" onclick="showPage('roster')">◈ AGENTS</button>
+    </nav>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="content">
+  <!-- Pages -->
+  <div id="pages">
 
-      <!-- OVERVIEW SECTION (stats) -->
-      <div class="section-panel active" id="section-overview">
-        <div class="stats" id="statsRow"></div>
-      </div>
+    <!-- PAGE 1: MAP -->
+    <div class="page active" id="map-page">
+      <div id="map-canvas-bg"></div>
 
-      <!-- AGENTS SECTION -->
-      <div class="section-panel active" id="section-agents">
-        <div class="section-label">AGENT STATIONS</div>
-        <div class="glow-line"></div>
-        <div class="agent-grid" id="agentGrid"></div>
-      </div>
+      <!-- HUD corners -->
+      <div class="hud-corner tl"></div>
+      <div class="hud-corner tr"></div>
+      <div class="hud-corner bl"></div>
+      <div class="hud-corner br"></div>
 
-    </div>
+      <!-- Connection lines SVG -->
+      <svg id="connection-svg"></svg>
 
-    <!-- SIDEBAR FEED -->
-    <aside class="sidebar" id="sidebar">
-      <div class="section-panel active" id="section-feed">
-        <div class="feed-panel">
-          <div class="feed-header">
-            <div class="feed-title">ACTIVITY FEED</div>
-            <div class="feed-dot"></div>
+      <!-- Sprites injected by JS -->
+
+      <!-- HUD Panel -->
+      <div id="hud-panel">
+        <button id="hud-close" onclick="closeHUD()">✕</button>
+        <div id="hud-name">—</div>
+        <div class="hud-row">
+          <div class="hud-label">STATUS</div>
+          <div class="hud-value hud-status">
+            <span id="hud-status-dot" class="status-dot-sprite idle"></span>
+            <span id="hud-status-txt">—</span>
           </div>
-          <div class="feed-list" id="activityFeed"></div>
         </div>
+        <div class="hud-row">
+          <div class="hud-label">ROLE</div>
+          <div class="hud-value" id="hud-role">—</div>
+        </div>
+        <div class="hud-row">
+          <div class="hud-label">CURRENT TASK</div>
+          <div class="hud-value" id="hud-task">—</div>
+        </div>
+        <div class="hud-row">
+          <div class="hud-label">TASKS COMPLETED TODAY</div>
+          <div class="hud-value" id="hud-completed">—</div>
+        </div>
+        <button id="hud-dossier" onclick="showPage('roster')">▶ VIEW DOSSIER</button>
       </div>
-    </aside>
+
+      <!-- Map bottom bar -->
+      <div id="map-bottom">
+        <div id="live-clock">—</div>
+        <div id="active-count">ACTIVE AGENTS: 4</div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: ROSTER -->
+    <div class="page" id="roster-page">
+      <div class="roster-header">// AGENT ROSTER //</div>
+      <div class="roster-grid" id="roster-grid"></div>
+    </div>
+
   </div>
+
+  <!-- Bottom Nav (mobile) -->
+  <nav id="bottom-nav">
+    <button class="bottom-nav-btn active" onclick="showPage('map')">
+      <span class="nav-icon">⬡</span>MAP
+    </button>
+    <button class="bottom-nav-btn" onclick="showPage('roster')">
+      <span class="nav-icon">◈</span>AGENTS
+    </button>
+  </nav>
 
 </div>
 
-<!-- BOTTOM NAV (mobile only) -->
-<nav class="bottom-nav" id="bottomNav">
-  <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">
-    <span class="nav-icon">🏠</span>
-    <span class="nav-label">Overview</span>
-  </button>
-  <button class="nav-tab" data-tab="agents" onclick="switchTab('agents')">
-    <span class="nav-icon">⚛️</span>
-    <span class="nav-label">Agents</span>
-  </button>
-  <button class="nav-tab" data-tab="feed" onclick="switchTab('feed')">
-    <span class="nav-icon">📋</span>
-    <span class="nav-label">Feed</span>
-  </button>
-</nav>
-
 <script>
-  // ─── AGENT DATA ──────────────────────────────────────────────
-  const AGENTS = {
-    at0m:     { name:"At0m",     role:"Executive / Strategic",      emoji:"⚛️",  status:"active",  current_task:"Managing operations",          completed_today:24 },
-    operator: { name:"Operator", role:"Team Manager",               emoji:"🎯",  status:"active",  current_task:"Dispatching LoRA training",     completed_today:2  },
-    miriam:   { name:"Miriam",   role:"Biblical Universe Creative",  emoji:"📜",  status:"idle",    current_task:"Next run: 2PM ET",             completed_today:1  },
-    solomon:  { name:"Solomon",  role:"Fitness Research",            emoji:"💪",  status:"idle",    current_task:"Awaiting schedule",            completed_today:1  },
-    daniel:   { name:"Daniel",   role:"Calendar & Intel",            emoji:"📅",  status:"idle",    current_task:"Scheduled 7AM ET",             completed_today:1  },
-    deborah:  { name:"Deborah",  role:"EOD Digest",                  emoji:"⚖️",  status:"paused",  current_task:"Paused — reactivating soon",   completed_today:0  },
-    ezra:     { name:"Ezra",     role:"Drive Sync",                  emoji:"📁",  status:"idle",    current_task:"Last sync: 30min ago",         completed_today:18 },
-    pulse:    { name:"Pulse",    role:"Email Dispatch",              emoji:"📧",  status:"idle",    current_task:"Monitoring inbox",             completed_today:3  },
-    forge:    { name:"Forge",    role:"Dev & Engineering",           emoji:"⚙️",  status:"active",  current_task:"Building Command Center",       completed_today:2  },
-    render:   { name:"Render",   role:"Image Generation",            emoji:"🎨",  status:"active",  current_task:"Training 5 character LoRAs",   completed_today:3  },
-    scribe:   { name:"Scribe",   role:"Content & Writing",           emoji:"✍️",  status:"idle",    current_task:"Books 1-5 complete",           completed_today:5  }
-  };
+// =================== DATA ===================
+const agents = {
+  at0m:     {name:"At0m",    role:"Executive / Strategic",      status:"active",  suit:"#1A3A5C", current_task:"Managing operations",        completed_today:24},
+  operator: {name:"Operator",role:"Team Manager",               status:"active",  suit:"#3A1A1A", current_task:"Dispatching LoRA training",  completed_today:2},
+  miriam:   {name:"Miriam",  role:"Biblical Universe Creative", status:"idle",    suit:"#2A1A3A", current_task:"Next run: 2PM ET",           completed_today:1},
+  solomon:  {name:"Solomon", role:"Fitness Research",           status:"idle",    suit:"#1A3A1A", current_task:"Awaiting schedule",          completed_today:1},
+  daniel:   {name:"Daniel",  role:"Calendar & Intel",           status:"idle",    suit:"#3A3A1A", current_task:"Scheduled 7AM ET",           completed_today:1},
+  deborah:  {name:"Deborah", role:"EOD Digest",                 status:"paused",  suit:"#3A2A1A", current_task:"Paused — reactivating soon", completed_today:0},
+  ezra:     {name:"Ezra",    role:"Drive Sync",                 status:"idle",    suit:"#1A2A3A", current_task:"Last sync: 30min ago",       completed_today:18},
+  pulse:    {name:"Pulse",   role:"Email Dispatch",             status:"idle",    suit:"#2A1A2A", current_task:"Monitoring inbox",           completed_today:3},
+  forge:    {name:"Forge",   role:"Dev & Engineering",          status:"active",  suit:"#2A2A1A", current_task:"Building Command Center",    completed_today:2},
+  render:   {name:"Render",  role:"Image Generation",           status:"active",  suit:"#1A3A3A", current_task:"Training 5 character LoRAs", completed_today:3},
+  scribe:   {name:"Scribe",  role:"Content & Writing",          status:"idle",    suit:"#3A1A3A", current_task:"Books 1-5 complete",         completed_today:5}
+};
 
-  // ─── ACTIVITY FEED DATA ──────────────────────────────────────
-  const ACTIVITY = [
-    { agent:"at0m",     task:"Strategic ops review complete",        mins:2   },
-    { agent:"render",   task:"LoRA checkpoint saved — Char #3",      mins:8   },
-    { agent:"ezra",     task:"Drive sync — 47 files updated",        mins:12  },
-    { agent:"at0m",     task:"Cross-agent briefing dispatched",      mins:18  },
-    { agent:"scribe",   task:"Book 5 manuscript finalized",          mins:25  },
-    { agent:"operator", task:"Training job dispatched to Render",    mins:31  },
-    { agent:"pulse",    task:"3 emails dispatched — outreach batch", mins:44  },
-    { agent:"ezra",     task:"Drive sync — 31 files updated",        mins:60  },
-    { agent:"forge",    task:"Command Center rebuild complete",       mins:72  },
-    { agent:"at0m",     task:"Agent health check completed",         mins:85  },
-    { agent:"scribe",   task:"Book 4 second draft done",             mins:98  },
-    { agent:"miriam",   task:"Chapter 12 narrative generated",       mins:110 },
-    { agent:"ezra",     task:"Drive sync — 22 files updated",        mins:120 },
-    { agent:"daniel",   task:"Weekly intel brief compiled",          mins:145 },
-    { agent:"solomon",  task:"Training protocol research done",      mins:160 },
-    { agent:"pulse",    task:"Inbox scan — no priority items",       mins:200 },
-    { agent:"render",   task:"LoRA checkpoint saved — Char #2",      mins:230 },
-    { agent:"at0m",     task:"Morning briefing logged",              mins:280 },
-  ];
+const taskLogs = {
+  at0m:     ["Reviewed daily ops briefing","Approved 3 agent tasks","Coordinate next sprint planning"],
+  operator: ["Dispatched Render LoRA task","Updated agent schedules","Queue next batch training run"],
+  miriam:   ["Draft chapter outline complete","Reviewed character arcs","Generate 3 scene illustrations"],
+  solomon:  ["Compiled recovery protocol data","Analyzed training metrics","Build 5-day program block"],
+  daniel:   ["Synced calendar with Levi","Flagged 2 priority meetings","Prep intel summary for tomorrow"],
+  deborah:  ["Last EOD sent successfully","Archive previous digests","Reactivate daily dispatch"],
+  ezra:     ["Synced 47 drive files","Verified folder structure","Full incremental backup run"],
+  pulse:    ["Processed 3 outbound emails","Cleared flagged inbox items","Monitor 2 pending responses"],
+  forge:    ["Rebuilt Command Center UI","Pushed to GitHub + Vercel","Integrate live Supabase feed"],
+  render:   ["Generated 12 character images","Started 5 LoRA training jobs","Render scene backgrounds"],
+  scribe:   ["Books 1-5 synopsis complete","Formatted chapter exports","Draft Books 6-8 outlines"]
+};
 
-  // ─── MOBILE TAB SWITCHING ────────────────────────────────────
-  let currentTab = 'overview';
+// =================== PASSWORD GATE ===================
+function initGate() {
+  if (sessionStorage.getItem('cmd_auth') === 'true') {
+    unlockApp(true);
+    return;
+  }
+  const input = document.getElementById('access-input');
+  const btn = document.getElementById('access-btn');
+  const err = document.getElementById('access-error');
 
-  function switchTab(tab) {
-    // Only apply on mobile (bottom nav visible)
-    if (window.innerWidth >= 900) return;
-
-    currentTab = tab;
-
-    // Update tab button states
-    document.querySelectorAll('.nav-tab').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tab);
-    });
-
-    // Sections: overview and agents are in .content, feed is in sidebar
-    const overviewEl = document.getElementById('section-overview');
-    const agentsEl   = document.getElementById('section-agents');
-    const feedEl     = document.getElementById('section-feed');
-    const sidebar    = document.getElementById('sidebar');
-
-    if (tab === 'overview') {
-      overviewEl.classList.add('active');
-      agentsEl.classList.remove('active');
-      sidebar.classList.remove('feed-visible');
-      feedEl.classList.remove('active');
-    } else if (tab === 'agents') {
-      overviewEl.classList.remove('active');
-      agentsEl.classList.add('active');
-      sidebar.classList.remove('feed-visible');
-      feedEl.classList.remove('active');
-    } else if (tab === 'feed') {
-      overviewEl.classList.remove('active');
-      agentsEl.classList.remove('active');
-      sidebar.classList.add('feed-visible');
-      feedEl.classList.add('active');
+  function attempt() {
+    if (input.value === 'LEVI2026') {
+      sessionStorage.setItem('cmd_auth', 'true');
+      document.getElementById('password-gate').classList.add('fade-out');
+      setTimeout(() => unlockApp(), 800);
+    } else {
+      err.classList.add('show');
+      input.classList.add('shake');
+      input.value = '';
+      setTimeout(() => {
+        input.classList.remove('shake');
+        err.classList.remove('show');
+      }, 1200);
     }
   }
 
-  // On resize: ensure desktop shows everything
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 900) {
-      ['section-overview','section-agents','section-feed'].forEach(id => {
-        document.getElementById(id).classList.add('active');
-      });
-      document.getElementById('sidebar').classList.remove('feed-visible');
-    } else {
-      // Re-apply current tab on shrink
-      switchTab(currentTab);
-    }
+  btn.addEventListener('click', attempt);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
+}
+
+function unlockApp(instant) {
+  const gate = document.getElementById('password-gate');
+  const app = document.getElementById('app');
+  if (instant) gate.style.display = 'none';
+  else setTimeout(() => { gate.style.display = 'none'; }, 800);
+  app.classList.add('visible');
+  initMap();
+  initRoster();
+  startClock();
+}
+
+// =================== NAVIGATION ===================
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn, .bottom-nav-btn').forEach(b => b.classList.remove('active'));
+
+  if (page === 'map') {
+    document.getElementById('map-page').classList.add('active');
+    document.querySelectorAll('[onclick="showPage(\'map\')"]').forEach(b => b.classList.add('active'));
+  } else {
+    document.getElementById('roster-page').classList.add('active');
+    document.querySelectorAll('[onclick="showPage(\'roster\')"]').forEach(b => b.classList.add('active'));
+  }
+}
+
+// =================== CLOCK ===================
+function startClock() {
+  function tick() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('live-clock').textContent =
+      `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())} UTC`;
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+// =================== MAP / SPRITES ===================
+const spriteState = {};
+
+function initMap() {
+  const map = document.getElementById('map-page');
+  const W = () => map.clientWidth;
+  const H = () => map.clientHeight - 36; // minus bottom bar
+
+  const agentKeys = Object.keys(agents);
+
+  // Init positions & velocities
+  agentKeys.forEach(key => {
+    const speed = 40 + Math.random() * 40;
+    const angle = Math.random() * Math.PI * 2;
+    spriteState[key] = {
+      x: 60 + Math.random() * (W() - 120),
+      y: 60 + Math.random() * (H() - 120),
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      facingRight: Math.cos(angle) > 0
+    };
   });
 
-  // ─── STATS ───────────────────────────────────────────────────
-  function computeStats() {
-    const agents = Object.values(AGENTS);
-    return {
-      active:     agents.filter(a => a.status === 'active').length,
-      completed:  agents.reduce((s,a) => s + a.completed_today, 0),
-      inprogress: agents.filter(a => a.status === 'active' || a.status === 'working').length,
-      paused:     agents.filter(a => a.status === 'paused').length
-    };
-  }
+  // Create sprite elements
+  agentKeys.forEach(key => {
+    const ag = agents[key];
+    const st = spriteState[key];
+    const el = document.createElement('div');
+    el.className = 'agent-sprite';
+    el.id = `sprite-${key}`;
+    el.style.left = st.x + 'px';
+    el.style.top  = st.y + 'px';
+    el.innerHTML = `
+      <div class="sprite-body-wrap">
+        <div class="sprite-head" style="background:${ag.suit}"></div>
+        <div class="sprite-visor"></div>
+        <div class="sprite-torso" style="background:${ag.suit}"></div>
+        <div class="sprite-pack" style="background:${ag.suit}"></div>
+        <div class="sprite-leg-l" style="background:${ag.suit}"></div>
+        <div class="sprite-leg-r" style="background:${ag.suit}"></div>
+      </div>
+      <div class="agent-label">${ag.name.toUpperCase()}</div>
+      <div class="status-dot-sprite ${ag.status}"></div>
+    `;
+    el.addEventListener('click', () => openHUD(key));
+    map.appendChild(el);
+  });
 
-  function renderStats() {
-    const s = computeStats();
-    document.getElementById('statsRow').innerHTML = `
-      <div class="stat-card blue">
-        <div class="stat-label">Agents Active</div>
-        <div class="stat-value">${s.active}</div>
-        <div class="stat-sub">of ${Object.keys(AGENTS).length} total</div>
+  // Animation loop
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    const w = W(), h = H();
+
+    agentKeys.forEach(key => {
+      const st = spriteState[key];
+      st.x += st.vx * dt;
+      st.y += st.vy * dt;
+
+      if (st.x < 10)         { st.x = 10;     st.vx = Math.abs(st.vx); st.facingRight = true; }
+      if (st.x > w - 50)     { st.x = w - 50; st.vx = -Math.abs(st.vx); st.facingRight = false; }
+      if (st.y < 10)         { st.y = 10;     st.vy = Math.abs(st.vy); }
+      if (st.y > h - 70)     { st.y = h - 70; st.vy = -Math.abs(st.vy); }
+
+      const el = document.getElementById(`sprite-${key}`);
+      if (el) {
+        el.style.left = st.x + 'px';
+        el.style.top  = st.y + 'px';
+        el.style.transform = st.facingRight ? '' : 'scaleX(-1)';
+      }
+    });
+
+    // Draw connection lines
+    drawConnections(agentKeys);
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+function drawConnections(keys) {
+  const svg = document.getElementById('connection-svg');
+  svg.innerHTML = '';
+  const DIST = 120;
+
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = i + 1; j < keys.length; j++) {
+      const a = spriteState[keys[i]];
+      const b = spriteState[keys[j]];
+      const dx = (a.x + 18) - (b.x + 18);
+      const dy = (a.y + 24) - (b.y + 24);
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < DIST) {
+        const alpha = (1 - d/DIST) * 0.6;
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', a.x + 18);
+        line.setAttribute('y1', a.y + 24);
+        line.setAttribute('x2', b.x + 18);
+        line.setAttribute('y2', b.y + 24);
+        line.setAttribute('stroke', `rgba(201,168,76,${alpha})`);
+        line.setAttribute('stroke-width', '1');
+        svg.appendChild(line);
+      }
+    }
+  }
+}
+
+// =================== HUD PANEL ===================
+function openHUD(key) {
+  const ag = agents[key];
+  document.getElementById('hud-name').textContent = ag.name.toUpperCase();
+  document.getElementById('hud-role').textContent = ag.role;
+  document.getElementById('hud-task').textContent = ag.current_task;
+  document.getElementById('hud-completed').textContent = ag.completed_today + ' tasks';
+  const dot = document.getElementById('hud-status-dot');
+  dot.className = `status-dot-sprite ${ag.status}`;
+  document.getElementById('hud-status-txt').textContent = ag.status.toUpperCase();
+  document.getElementById('hud-panel').classList.add('open');
+}
+
+function closeHUD() {
+  document.getElementById('hud-panel').classList.remove('open');
+}
+
+// =================== ROSTER ===================
+function initRoster() {
+  const grid = document.getElementById('roster-grid');
+  const activeCount = Object.values(agents).filter(a => a.status === 'active').length;
+  document.getElementById('active-count').textContent = `ACTIVE AGENTS: ${activeCount}`;
+
+  Object.entries(agents).forEach(([key, ag]) => {
+    const logs = taskLogs[key] || ['Task 1','Task 2','Pending task'];
+    const card = document.createElement('div');
+    card.className = 'agent-card';
+
+    const classLabel = ag.status === 'active' ? 'PRIORITY' : ag.status === 'paused' ? 'STANDBY' : 'ASSIGNED';
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="status-dot ${ag.status}"></div>
+        <div class="card-name">${ag.name.toUpperCase()}</div>
+        <div class="class-badge">${classLabel}</div>
       </div>
-      <div class="stat-card green">
-        <div class="stat-label">Tasks Today</div>
-        <div class="stat-value">${s.completed}</div>
-        <div class="stat-sub">across all agents</div>
+      <div class="card-role">${ag.role}</div>
+      <div class="card-task">
+        <div class="task-label">CURRENT TASK</div>
+        <div>${ag.current_task}</div>
       </div>
-      <div class="stat-card orange">
-        <div class="stat-label">In Progress</div>
-        <div class="stat-value">${s.inprogress}</div>
-        <div class="stat-sub">agents running</div>
+      <div class="card-stats">
+        <span>COMPLETED TODAY: <strong style="color:var(--gold-bright)">${ag.completed_today}</strong></span>
+        <span>STATUS: ${ag.status.toUpperCase()}</span>
       </div>
-      <div class="stat-card grey">
-        <div class="stat-label">Paused</div>
-        <div class="stat-value">${s.paused}</div>
-        <div class="stat-sub">reactivating soon</div>
+      <button class="task-log-toggle" onclick="toggleLog(this)">▼ TASK LOG</button>
+      <div class="task-log">
+        <div class="task-item"><span class="tick">✓</span><span>${logs[0]}</span></div>
+        <div class="task-item"><span class="tick">✓</span><span>${logs[1]}</span></div>
+        <div class="task-item"><span class="pend">⏳</span><span>${logs[2]}</span></div>
       </div>
     `;
-    document.getElementById('totalTasks').textContent = s.completed;
-  }
 
-  // ─── AGENT GRID ──────────────────────────────────────────────
-  function dotClass(status) {
-    if (status === 'active')  return 'active';
-    if (status === 'working') return 'working';
-    if (status === 'paused')  return 'paused';
-    return 'idle';
-  }
-  function badgeLabel(status) {
-    if (status === 'active')  return 'ONLINE';
-    if (status === 'working') return 'WORKING';
-    if (status === 'paused')  return 'PAUSED';
-    return 'IDLE';
-  }
+    grid.appendChild(card);
+  });
+}
 
-  function renderAgents() {
-    const grid = document.getElementById('agentGrid');
-    grid.innerHTML = Object.entries(AGENTS).map(([key, a]) => {
-      const cardClass = ['agent-card', a.status === 'active' ? 'active' : '', a.status === 'paused' ? 'paused' : ''].filter(Boolean).join(' ');
-      const completedClass = a.completed_today === 0 ? 'card-completed zero' : 'card-completed';
-      return `
-        <div class="${cardClass}">
-          <div class="card-header">
-            <span class="card-emoji">${a.emoji}</span>
-            <span class="status-dot ${dotClass(a.status)}"></span>
-          </div>
-          <div class="card-name">${a.name.toUpperCase()}</div>
-          <div class="card-role">${a.role}</div>
-          <div class="card-divider"></div>
-          <div class="card-task">${a.current_task}</div>
-          <div class="card-meta">
-            <span class="status-badge ${a.status}">${badgeLabel(a.status)}</span>
-            <span class="${completedClass}">✓ ${a.completed_today} today</span>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
+function toggleLog(btn) {
+  const log = btn.nextElementSibling;
+  const open = log.classList.toggle('open');
+  btn.textContent = open ? '▲ TASK LOG' : '▼ TASK LOG';
+}
 
-  // ─── ACTIVITY FEED ───────────────────────────────────────────
-  function renderFeed() {
-    const feed = document.getElementById('activityFeed');
-    feed.innerHTML = ACTIVITY.map(item => {
-      const agent = AGENTS[item.agent];
-      if (!agent) return '';
-      const timeLabel = item.mins < 60
-        ? `${item.mins}m ago`
-        : `${Math.floor(item.mins/60)}h ${item.mins%60}m ago`;
-      return `
-        <div class="feed-item">
-          <div class="feed-agent">
-            <span class="feed-agent-emoji">${agent.emoji}</span>
-            <span class="feed-agent-name">${agent.name.toUpperCase()}</span>
-            <span class="feed-agent-time">${timeLabel}</span>
-          </div>
-          <div class="feed-task"><span class="feed-check">✓</span>${item.task}</div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // ─── CLOCK ───────────────────────────────────────────────────
-  function updateClock() {
-    const now = new Date();
-    const hh = String(now.getUTCHours()).padStart(2,'0');
-    const mm = String(now.getUTCMinutes()).padStart(2,'0');
-    const ss = String(now.getUTCSeconds()).padStart(2,'0');
-    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
-
-    const days   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    const d  = days[now.getUTCDay()];
-    const mo = months[now.getUTCMonth()];
-    const dt = String(now.getUTCDate()).padStart(2,'0');
-    const yr = now.getUTCFullYear();
-    document.getElementById('dateDisplay').textContent = `${d} ${dt} ${mo} ${yr} · UTC`;
-  }
-
-  // ─── INIT ─────────────────────────────────────────────────────
-  renderStats();
-  renderAgents();
-  renderFeed();
-  updateClock();
-  setInterval(updateClock, 1000);
-
-  // Initialize mobile view: show overview by default
-  if (window.innerWidth < 900) {
-    switchTab('overview');
-  }
+// =================== BOOT ===================
+initGate();
 </script>
 </body>
 </html>
