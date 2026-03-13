@@ -461,7 +461,7 @@ function animate(ts){
       s.flipX = dx < 0;
       s.el.querySelector('.sprite-svg').style.transform = s.flipX ? 'scaleX(-1)' : '';
       // Counter-rotate name label so it stays readable
-      s.el.querySelector('.sprite-name').style.transform = s.flipX ? 'scaleX(-1)' : '';
+      // name stays unflipped always — only the sprite SVG flips
     }
     s.el.style.left = s.x+'px';
     s.el.style.top = s.y+'px';
