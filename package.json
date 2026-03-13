@@ -1,0 +1,11 @@
+{
+  "name": "command-center",
+  "version": "1.0.0",
+  "description": "Book of Levi — Agent Command Center",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["agents", "dashboard", "ops"],
+  "license": "UNLICENSED"
+}
